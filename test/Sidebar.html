@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html>
 
-  <head>
-    <base target="_top">
-    <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
+<head>
+  <base target="_top">
+  <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.3.2/css/flag-icons.min.css" />
   <style>
   body {
@@ -393,6 +393,7 @@
       opacity: 0;
       transform: scale(0.9) translateY(-20px);
     }
+
     to {
       opacity: 1;
       transform: scale(1) translateY(0);
@@ -460,7 +461,8 @@
     margin-top: 0;
   }
 
-  .help-body ol, .help-body ul {
+  .help-body ol,
+  .help-body ul {
     margin: 12px 0;
     padding-left: 20px;
   }
@@ -527,7 +529,7 @@
         </div>
       </div>
     </div>
-    
+
     <!-- HTML Template for dropdown items -->
     <template id="dropdownItemTemplate">
       <div class="dropdown-item" data-code="">
@@ -539,7 +541,7 @@
 
     <button class="translate-button" onclick="translateContent()">TRANSLATE</button>
 
-    <div id="status" class="status"></div>
+    <div id="status" class="status" onclick="hideStatus()"></div>
 
     <!-- Advanced Settings Section -->
     <div class="advanced-settings">
@@ -569,13 +571,13 @@
         </div>
       </div>
     </div>
-    
+
     <!-- About Information -->
     <div class="about-info">
       Google Sheets Translation Extension v1.0 - Translate your spreadsheet content easily!
     </div>
-    </div>
-    
+  </div>
+
   <!-- Help Overlay -->
   <div id="helpOverlay" class="help-overlay" style="display: none;">
     <div class="help-content">
@@ -586,18 +588,22 @@
       <div class="help-body">
         <h3>How to Use the Translation Extension:</h3>
         <ol>
-          <li><strong>Select Source Language:</strong> Choose the language of your current content, or use "Auto detect" to automatically identify the language.</li>
+          <li><strong>Select Source Language:</strong> Choose the language of your current content, or use "Auto detect"
+            to automatically identify the language.</li>
           <li><strong>Select Target Language:</strong> Choose the language you want to translate to.</li>
           <li><strong>Click TRANSLATE:</strong> The extension will translate your selected content.</li>
         </ol>
-        
+
         <h3>Advanced Settings:</h3>
         <ul>
-          <li><strong>Translate full sheet:</strong> Translate the entire spreadsheet instead of just selected cells.</li>
-          <li><strong>Duplicate sheet before translate:</strong> Create a copy of your sheet before translating to preserve the original.</li>
-          <li><strong>Apply background color to edited cells:</strong> Highlight translated cells with a background color for easy identification.</li>
+          <li><strong>Translate full sheet:</strong> Translate the entire spreadsheet instead of just selected cells.
+          </li>
+          <li><strong>Duplicate sheet before translate:</strong> Create a copy of your sheet before translating to
+            preserve the original.</li>
+          <li><strong>Apply background color to edited cells:</strong> Highlight translated cells with a background
+            color for easy identification.</li>
         </ul>
-        
+
         <h3>Tips:</h3>
         <ul>
           <li>Make sure you have selected the cells you want to translate before clicking TRANSLATE.</li>
@@ -954,26 +960,6 @@
 
     showStatus('Translating...', STATUS_TYPES.SUCCESS);
 
-    // try {
-    //   if (typeof google !== 'undefined' && google.script && google.script.run) {
-    //     google.script.run
-    //       .withSuccessHandler(function () {
-    //         showStatus(`Translation completed from ${selectedSourceLanguage} to ${selectedTargetLanguage}`, STATUS_TYPES.SUCCESS);
-    //       })
-    //       .withFailureHandler(function (error) {
-    //         showStatus(error, STATUS_TYPES.ERROR);
-    //       })
-    //       .translateCurrentCell(selectedSourceLanguage, selectedTargetLanguage);
-    //   } else {
-    //     // Fallback for local development or when Google Apps Script is not available
-    //     showStatus('Google Apps Script environment not available. This is a demo mode.', STATUS_TYPES.ERROR);
-    //   }
-    // } catch (error) {
-    //   showStatus(error, STATUS_TYPES.ERROR);
-    // } finally {
-    //   enableTranslateButton();
-    // }
-
     const scriptContext = tryGetGoogleScriptContext(
       () => {
         showStatus(`Translation completed from ${selectedSourceLanguage} to ${selectedTargetLanguage}`, STATUS_TYPES.SUCCESS);
@@ -1042,7 +1028,6 @@
     });
   }
 
-
   /**
    * Shows a status message
    * @param {string} message - The message to show
@@ -1072,7 +1057,7 @@
 
 </script>
   <script>
-    </script>
-  </body>
+  </script>
+</body>
 
 </html>
