@@ -1,0 +1,42 @@
+# Google Spreadsheet Translator - Cursor Rules
+
+## Project Overview
+This is a Google Apps Script extension for translating spreadsheet content with a custom sidebar interface.
+
+## Project Structure
+- `src/Code.gs` - Server-side Google Apps Script logic
+- `src/Sidebar.html` - Main HTML template with Google Apps Script includes
+- `src/Stylesheet.html` - CSS styles for the sidebar interface
+- `src/Javascript.html` - Client-side JavaScript functionality
+- `src/appsscript.json` - Google Apps Script project configuration
+- `.clasp.json` - Clasp CLI configuration for deployment
+- `build-test.js` - Local development build script
+
+## Development Guidelines
+
+### Google Apps Script Development
+- Use `<?!= include('Filename'); ?>` syntax for including separate HTML files
+- Server-side functions in `Code.gs` should be prefixed with appropriate naming
+- Client-side communication uses `google.script.run` with proper error handling
+
+### File Organization
+- Keep HTML, CSS, and JavaScript in separate files for maintainability
+- Use the build script (`build-test.js`) for local development testing
+- Maintain consistent naming conventions across all files
+
+### Code Standards
+- Use modern JavaScript (ES6+) features where supported
+- Implement proper error handling with try-catch blocks
+- Use CSS classes instead of inline styles for better maintainability
+- Follow Google Apps Script best practices for performance
+
+### Deployment
+- Use `clasp push` to deploy changes to Google Apps Script
+- Test locally using the build script before deploying
+- Ensure all file extensions are properly configured in `.clasp.json`
+
+## Notes
+- The project uses Google Apps Script's HTML templating system
+- Local development requires the build script to merge separate files
+- Flag icons are loaded from CDN for language selection
+- The interface includes advanced settings and help overlay functionality
