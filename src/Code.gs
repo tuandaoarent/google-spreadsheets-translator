@@ -83,10 +83,7 @@ function translateCurrentCell(sourceLanguage, targetLanguage) {
 
   // Check if cell has content
   if (!cellValue || cellValue.toString().trim() === '') {
-    return {
-      success: false,
-      message: 'No content found in the selected cell'
-    };
+    throw new Error('No content found in the selected cell');
   }
 
   // Handle auto-detect source language
@@ -101,6 +98,29 @@ function translateCurrentCell(sourceLanguage, targetLanguage) {
   activeCell.setValue(translatedText);
 }
 
+function translateCurrentSheet(sourceLanguage, targetLanguage) {
+  const sheet = SpreadsheetApp.getActiveSheet();
+  const dataRange = sheet.getDataRange(); // Gets the range with data
+  const values = dataRange.getValues();
+
+  if (sourceLanguage === 'auto') {
+    sourceLanguage = '';
+  }
+
+  // Iterate through rows and columns
+  for (let row = 0; row < values.length; row++) {
+    for (let col = 0; col < values[row].length; col++) {
+      const cellValue = values[row][col];
+
+      if (!cellValue || cellValue.toString().trim() === '') {
+        continue;
+      }
+
+      const translatedText = LanguageApp.translate(cellValue.toString(), sourceLanguage, targetLanguage)
+      sheet.getRange(row + 1, col + 1).setValue(translatedText);;
+    }
+  }
+}
 
 function include(filename) {
   return HtmlService.createHtmlOutputFromFile(filename).getContent();
