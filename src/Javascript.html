@@ -69,6 +69,7 @@
   let selectedTargetLanguage = 'en';
   let sourceDropdownOpen = false;
   let targetDropdownOpen = false;
+  let statusTimeout = null;
 
   // Load initial data when sidebar opens
   document.addEventListener('DOMContentLoaded', function () {
@@ -87,6 +88,7 @@
     updateLanguageDisplay();
     updateToggleStates();
     setupClickOutside();
+    setupHelpOverlay();
   }
 
   /**
@@ -323,6 +325,12 @@
    * Translate content
    */
   function translateContent() {
+    // Disable the translate button
+    const translateButton = document.querySelector('.translate-button');
+    translateButton.disabled = true;
+    translateButton.textContent = 'TRANSLATING...';
+    translateButton.classList.add('translating');
+
     showStatus('Translating...', 'success');
 
     // Get translation settings
@@ -332,27 +340,76 @@
       settings: settings
     };
 
-    google.script.run
-      .withSuccessHandler(function (result) {
-        showStatus('Translation completed successfully!', 'success');
-      })
-      .withFailureHandler(showError)
-      .translateContent(translationData);
+    try {
+      if (typeof google !== 'undefined' && google.script && google.script.run) {
+        google.script.run
+          .withSuccessHandler(function (result) {
+            showStatus('Translation completed successfully!', 'success');
+          })
+          .withFailureHandler(function(error) {
+            showError(error);
+          })
+          .translateContent(translationData);
+      } else {
+        // Fallback for local development or when Google Apps Script is not available
+        showStatus('Google Apps Script environment not available. This is a demo mode.', 'error');
+      }
+    } catch (error) {
+      showError(error);
+    } finally {
+      enableTranslateButton();
+    }
   }
 
   /**
-   * Show help
+   * Enable the translate button
+   */
+  function enableTranslateButton() {
+    const translateButton = document.querySelector('.translate-button');
+    translateButton.disabled = false;
+    translateButton.textContent = 'TRANSLATE';
+    translateButton.classList.remove('translating');
+  }
+
+  /**
+   * Show help overlay
    */
   function showHelp() {
-    showStatus('Help: Select source and target languages, then click TRANSLATE. Use advanced settings to customize the translation process.', 'success');
+    const overlay = document.getElementById('helpOverlay');
+    overlay.style.display = 'flex';
+    document.body.style.overflow = 'hidden'; // Prevent background scrolling
   }
 
   /**
-   * Show about
+   * Close help overlay
    */
-  function showAbout() {
-    showStatus('Google Sheets Translation Extension v1.0 - Translate your spreadsheet content easily!', 'success');
+  function closeHelp() {
+    const overlay = document.getElementById('helpOverlay');
+    overlay.style.display = 'none';
+    document.body.style.overflow = 'auto'; // Restore scrolling
   }
+
+  /**
+   * Setup help overlay event listeners
+   */
+  function setupHelpOverlay() {
+    const overlay = document.getElementById('helpOverlay');
+    
+    // Close on overlay background click
+    overlay.addEventListener('click', function(e) {
+      if (e.target === overlay) {
+        closeHelp();
+      }
+    });
+    
+    // Close on escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && overlay.style.display === 'flex') {
+        closeHelp();
+      }
+    });
+  }
+
 
   /**
    * Shows a status message
@@ -365,9 +422,15 @@
     statusDiv.className = 'status ' + type;
     statusDiv.style.display = 'block';
 
+    // Clear any existing timeout
+    if (statusTimeout) {
+      clearTimeout(statusTimeout);
+    }
+
     // Hide status after 4 seconds
-    setTimeout(function () {
+    statusTimeout = setTimeout(function () {
       statusDiv.style.display = 'none';
+      statusTimeout = null;
     }, 4000);
   }
 

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html>
 
-<head>
-  <base target="_top">
-  <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
+  <head>
+    <base target="_top">
+    <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.3.2/css/flag-icons.min.css" />
   <?!= include('Stylesheet'); ?>
 </head>
@@ -40,7 +40,7 @@
         </div>
       </div>
     </div>
-
+    
     <!-- HTML Template for dropdown items -->
     <template id="dropdownItemTemplate">
       <div class="dropdown-item" data-code="">
@@ -51,6 +51,8 @@
     </template>
 
     <button class="translate-button" onclick="translateContent()">TRANSLATE</button>
+
+    <div id="status" class="status"></div>
 
     <!-- Advanced Settings Section -->
     <div class="advanced-settings">
@@ -80,21 +82,54 @@
         </div>
       </div>
     </div>
-
-    <div id="status" class="status"></div>
+    
+    <!-- About Information -->
+    <div class="about-info">
+      Google Sheets Translation Extension v1.0 - Translate your spreadsheet content easily!
+    </div>
+    </div>
+    
+  <!-- Help Overlay -->
+  <div id="helpOverlay" class="help-overlay" style="display: none;">
+    <div class="help-content">
+      <div class="help-header">
+        <h2>Help & Instructions</h2>
+        <button class="help-close" onclick="closeHelp()">&times;</button>
+      </div>
+      <div class="help-body">
+        <h3>How to Use the Translation Extension:</h3>
+        <ol>
+          <li><strong>Select Source Language:</strong> Choose the language of your current content, or use "Auto detect" to automatically identify the language.</li>
+          <li><strong>Select Target Language:</strong> Choose the language you want to translate to.</li>
+          <li><strong>Click TRANSLATE:</strong> The extension will translate your selected content.</li>
+        </ol>
+        
+        <h3>Advanced Settings:</h3>
+        <ul>
+          <li><strong>Translate full sheet:</strong> Translate the entire spreadsheet instead of just selected cells.</li>
+          <li><strong>Duplicate sheet before translate:</strong> Create a copy of your sheet before translating to preserve the original.</li>
+          <li><strong>Apply background color to edited cells:</strong> Highlight translated cells with a background color for easy identification.</li>
+        </ul>
+        
+        <h3>Tips:</h3>
+        <ul>
+          <li>Make sure you have selected the cells you want to translate before clicking TRANSLATE.</li>
+          <li>Use "Auto detect" for source language when you're unsure of the original language.</li>
+          <li>Enable "Duplicate sheet" to keep your original data safe.</li>
+        </ul>
+      </div>
+    </div>
   </div>
 
   <div class="footer">
     <div class="footer-links">
       <a href="#" onclick="showHelp()">Need help?</a>
-      <span class="separator">|</span>
-      <a href="#" onclick="showAbout()">About</a>
     </div>
   </div>
 
   <?!= include('Javascript'); ?>
   <script>
-  </script>
-</body>
+    </script>
+  </body>
 
 </html>
