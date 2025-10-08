@@ -17,10 +17,11 @@ function onOpen() {
  * Shows the Hello World sidebar
  */
 function showHelloWorld() {
-  const html = HtmlService.createHtmlOutputFromFile('Sidebar')
+  const html = HtmlService.createTemplateFromFile('Sidebar')
+    .evaluate()
     .setTitle('Hello World Extension')
     .setWidth(300);
-  
+
   SpreadsheetApp.getUi().showSidebar(html);
 }
 
@@ -65,4 +66,8 @@ function getSpreadsheetInfo() {
     lastColumn: sheet.getLastColumn(),
     activeCellAddress: sheet.getActiveCell().getA1Notation()
   };
+}
+
+function include(filename) {
+  return HtmlService.createHtmlOutputFromFile(filename).getContent();
 }

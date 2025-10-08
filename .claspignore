@@ -1,0 +1,42 @@
+# Clasp ignore file - specifies which files to ignore when pushing to Google Apps Script
+# Copy this file to .claspignore and customize as needed
+
+# Node.js dependencies
+node_modules/
+
+# Development files
+*.log
+*.tmp
+*.backup
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment files
+.env
+.env.local
+
+# Build outputs
+dist/
+build/
+
+# Documentation (optional - remove if you want to include docs in Apps Script)
+*.md
+README.md
+
+# Git files
+.git/
+.gitignore
+
+# Example files
+*.example
+
+test/
+build-test.js

@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <base target="_top">
+  <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.3.2/css/flag-icons.min.css" />
+  <style>
+  body {
+    font-family: 'Roboto', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #2d5a3d;
+    color: #333;
+    height: 100vh;
+    overflow-y: auto;
+  }
+
+  .main-content {
+    background-color: #f5f5f5;
+    margin: 8px;
+    border-radius: 12px 12px 0 0;
+    min-height: calc(100vh - 16px);
+    padding: 20px;
+  }
+
+  .section-title {
+    color: #2d5a3d;
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #2d5a3d;
+  }
+
+  .language-group {
+    margin-bottom: 20px;
+  }
+
+  .language-label {
+    display: block;
+    font-size: 14px;
+    color: #333;
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+
+  .language-select {
+    position: relative;
+    width: 100%;
+  }
+
+  .language-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: none;
+    border-radius: 8px;
+    background-color: #e8e8e8;
+    font-size: 14px;
+    color: #333;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    position: relative;
+    z-index: 1;
+  }
+
+  .language-input:focus {
+    outline: none;
+    background-color: #ddd;
+  }
+
+  .language-icon {
+    width: 16px;
+    height: 16px;
+    margin-right: 8px;
+    display: inline-block;
+    font-size: 16px;
+  }
+
+  .language-text {
+    flex: 1;
+    text-align: left;
+  }
+
+  .dropdown-arrow {
+    width: 16px;
+    height: 16px;
+    margin-left: auto;
+    opacity: 0.6;
+    font-size: 12px;
+    transition: transform 0.3s ease;
+  }
+
+  .language-input.open .dropdown-arrow {
+    transform: rotate(180deg);
+  }
+
+  .dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    max-height: 200px;
+    overflow-y: auto;
+    display: none;
+    margin-top: 2px;
+  }
+
+  .dropdown-menu.open {
+    display: block;
+  }
+
+  .dropdown-item {
+    padding: 12px 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    color: #333;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background-color 0.2s ease;
+  }
+
+  .dropdown-item:last-child {
+    border-bottom: none;
+  }
+
+  .dropdown-item:hover {
+    background-color: #f8f9fa;
+  }
+
+  .dropdown-item.selected {
+    background-color: #007bff;
+    color: white;
+  }
+
+  .dropdown-item .language-icon {
+    margin-right: 8px;
+    font-size: 16px;
+  }
+
+  .dropdown-item .country-code {
+    font-size: 12px;
+    color: #666;
+    width: 24px;
+    text-align: center;
+  }
+
+  .dropdown-item.selected .country-code {
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  .dropdown-item .language-icon {
+    width: 20px;
+    text-align: center;
+  }
+
+  .dropdown-item .language-name {
+    flex: 1;
+  }
+
+  /* Custom scrollbar for dropdown */
+  .dropdown-menu::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .dropdown-menu::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+  }
+
+  .dropdown-menu::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+  }
+
+  .dropdown-menu::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+  }
+
+  .translate-button {
+    width: 100%;
+    height: auto;
+    background-color: #f5f5f5;
+    color: #333;
+    border: 1px solid #ddd;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    text-transform: uppercase;
+    text-align: center;
+    cursor: pointer;
+    margin-top: 20px;
+    margin-bottom: 30px;
+    transition: background-color 0.3s ease;
+    display: block;
+    box-sizing: border-box;
+    line-height: 1.2;
+  }
+
+  .translate-button:hover {
+    background-color: #e9e9e9;
+  }
+
+  .translate-button:active {
+    background-color: #ddd;
+  }
+
+  .advanced-settings {
+    margin-top: 30px;
+  }
+
+  .advanced-title {
+    display: flex;
+    align-items: center;
+    color: #2d5a3d;
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #2d5a3d;
+  }
+
+  .gear-icon {
+    width: 16px;
+    height: 16px;
+    margin-right: 8px;
+    opacity: 0.7;
+    display: inline-block;
+    vertical-align: middle;
+    line-height: 1;
+  }
+
+  .setting-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    font-size: 14px;
+    color: #333;
+  }
+
+  .setting-label {
+    flex: 1;
+    text-align: left;
+  }
+
+  .toggle-switch {
+    position: relative;
+    width: 44px;
+    height: 24px;
+    background-color: #ccc;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  .toggle-switch.active {
+    background-color: #2d5a3d;
+  }
+
+  .toggle-slider {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 20px;
+    height: 20px;
+    background-color: white;
+    border-radius: 50%;
+    transition: transform 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+
+  .toggle-switch.active .toggle-slider {
+    transform: translateX(20px);
+  }
+
+  .footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: #2d5a3d;
+    padding: 12px 20px;
+    text-align: center;
+    font-size: 12px;
+  }
+
+  .footer-links {
+    color: #90c695;
+  }
+
+  .footer-links a {
+    color: #90c695;
+    text-decoration: none;
+    margin: 0 8px;
+  }
+
+  .footer-links a:hover {
+    color: #a8d4ac;
+  }
+
+  .separator {
+    color: #90c695;
+    margin: 0 4px;
+  }
+
+  .status {
+    text-align: center;
+    padding: 10px;
+    border-radius: 4px;
+    margin-top: 10px;
+    font-size: 12px;
+    font-weight: 500;
+    display: none;
+  }
+
+  .status.success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+  }
+
+  .status.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+  }
+</style>
+</head>
+
+<body>
+  <div class="main-content">
+    <!-- Translation Section -->
+    <h2 class="section-title">Translation</h2>
+
+    <div class="language-group" id="sourceLanguageGroup">
+      <label class="language-label">Source language</label>
+      <div class="language-select">
+        <div class="language-input" onclick="toggleSourceDropdown()">
+          <span class="language-icon"></span>
+          <span class="language-text"></span>
+          <span class="dropdown-arrow">⏷</span>
+        </div>
+        <div class="dropdown-menu">
+          <!-- Source language options will be populated by JavaScript -->
+        </div>
+      </div>
+    </div>
+
+    <div class="language-group" id="targetLanguageGroup">
+      <label class="language-label">Target language</label>
+      <div class="language-select">
+        <div class="language-input" onclick="toggleTargetDropdown()">
+          <span class="language-icon"></span>
+          <span class="language-text"></span>
+          <span class="dropdown-arrow">⏷</span>
+        </div>
+        <div class="dropdown-menu">
+          <!-- Target language options will be populated by JavaScript -->
+        </div>
+      </div>
+    </div>
+
+    <!-- HTML Template for dropdown items -->
+    <template id="dropdownItemTemplate">
+      <div class="dropdown-item" data-code="">
+        <span class="language-icon fi"></span>
+        <div class="country-code"></div>
+        <span class="language-name"></span>
+      </div>
+    </template>
+
+    <button class="translate-button" onclick="translateContent()">TRANSLATE</button>
+
+    <!-- Advanced Settings Section -->
+    <div class="advanced-settings">
+      <h2 class="advanced-title">
+        <span class="gear-icon">⚙️</span>
+        Advanced settings
+      </h2>
+
+      <div class="setting-item">
+        <span class="setting-label">Translate full sheet</span>
+        <div class="toggle-switch" id="fullSheetToggle" onclick="toggleSetting('fullSheet')">
+          <div class="toggle-slider"></div>
+        </div>
+      </div>
+
+      <div class="setting-item">
+        <span class="setting-label">Duplicate sheet before to translate</span>
+        <div class="toggle-switch active" id="duplicateSheetToggle" onclick="toggleSetting('duplicateSheet')">
+          <div class="toggle-slider"></div>
+        </div>
+      </div>
+
+      <div class="setting-item">
+        <span class="setting-label">Apply background color to edited cells</span>
+        <div class="toggle-switch active" id="backgroundColorToggle" onclick="toggleSetting('backgroundColor')">
+          <div class="toggle-slider"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="status" class="status"></div>
+  </div>
+
+  <div class="footer">
+    <div class="footer-links">
+      <a href="#" onclick="showHelp()">Need help?</a>
+      <span class="separator">|</span>
+      <a href="#" onclick="showAbout()">About</a>
+    </div>
+  </div>
+
+  <script>
+  // Translation settings
+  let settings = {
+    fullSheet: false,
+    duplicateSheet: true,
+    backgroundColor: true
+  };
+
+  // Language options - comprehensive list matching the image
+  const languages = [
+    { code: 'auto', name: 'Auto detect', codeDisplay: '' },
+    { code: 'us', name: 'English', codeDisplay: '🇺🇸' },
+    { code: 'fr', name: 'French', codeDisplay: '🇫🇷' },
+    { code: 'de', name: 'German', codeDisplay: '🇩🇪' },
+    { code: 'it', name: 'Italian', codeDisplay: '🇮🇹' },
+    { code: 'es', name: 'Spanish', codeDisplay: '🇪🇸' },
+    { code: 'za', name: 'Afrikaans', codeDisplay: '' },
+    { code: 'al', name: 'Albanian', codeDisplay: '🇦🇱' },
+    { code: 'sa', name: 'Arabic', codeDisplay: '🇸🇦' },
+    { code: 'az', name: 'Azerbaijani', codeDisplay: '🇦🇿' },
+    { code: 'es', name: 'Basque', codeDisplay: '' },
+    { code: 'bd', name: 'Bengali', codeDisplay: '' },
+    { code: 'by', name: 'Belarusian', codeDisplay: '🇧🇾' },
+    { code: 'bg', name: 'Bulgarian', codeDisplay: '🇧🇬' },
+    { code: 'mm', name: 'Burmese', codeDisplay: '🇲🇲' },
+    { code: 'es', name: 'Catalan', codeDisplay: '' },
+    { code: 'cn', name: 'Chinese (Simplified)', codeDisplay: '🇨🇳' },
+    { code: 'tw', name: 'Chinese (Traditional)', codeDisplay: '🇹🇼' },
+    { code: 'hr', name: 'Croatian', codeDisplay: '🇭🇷' },
+    { code: 'cz', name: 'Czech', codeDisplay: '🇨🇿' },
+    { code: 'dk', name: 'Danish', codeDisplay: '🇩🇰' },
+    { code: 'nl', name: 'Dutch', codeDisplay: '🇳🇱' },
+    { code: 'ee', name: 'Estonian', codeDisplay: '🇪🇪' },
+    { code: 'fi', name: 'Finnish', codeDisplay: '🇫🇮' },
+    { code: 'gr', name: 'Greek', codeDisplay: '🇬🇷' },
+    { code: 'il', name: 'Hebrew', codeDisplay: '🇮🇱' },
+    { code: 'in', name: 'Hindi', codeDisplay: '🇮🇳' },
+    { code: 'hu', name: 'Hungarian', codeDisplay: '🇭🇺' },
+    { code: 'is', name: 'Icelandic', codeDisplay: '🇮🇸' },
+    { code: 'id', name: 'Indonesian', codeDisplay: '🇮🇩' },
+    { code: 'ie', name: 'Irish', codeDisplay: '🇮🇪' },
+    { code: 'jp', name: 'Japanese', codeDisplay: '🇯🇵' },
+    { code: 'kr', name: 'Korean', codeDisplay: '🇰🇷' },
+    { code: 'lv', name: 'Latvian', codeDisplay: '🇱🇻' },
+    { code: 'lt', name: 'Lithuanian', codeDisplay: '🇱🇹' },
+    { code: 'mk', name: 'Macedonian', codeDisplay: '🇲🇰' },
+    { code: 'my', name: 'Malay', codeDisplay: '🇲🇾' },
+    { code: 'mt', name: 'Maltese', codeDisplay: '🇲🇹' },
+    { code: 'no', name: 'Norwegian', codeDisplay: '🇳🇴' },
+    { code: 'ir', name: 'Persian', codeDisplay: '🇮🇷' },
+    { code: 'pl', name: 'Polish', codeDisplay: '🇵🇱' },
+    { code: 'pt', name: 'Portuguese', codeDisplay: '🇵🇹' },
+    { code: 'ro', name: 'Romanian', codeDisplay: '🇷🇴' },
+    { code: 'ru', name: 'Russian', codeDisplay: '🇷🇺' },
+    { code: 'rs', name: 'Serbian', codeDisplay: '🇷🇸' },
+    { code: 'sk', name: 'Slovak', codeDisplay: '🇸🇰' },
+    { code: 'si', name: 'Slovenian', codeDisplay: '🇸🇮' },
+    { code: 'tz', name: 'Swahili', codeDisplay: '🇹🇿' },
+    { code: 'se', name: 'Swedish', codeDisplay: '🇸🇪' },
+    { code: 'th', name: 'Thai', codeDisplay: '🇹🇭' },
+    { code: 'tr', name: 'Turkish', codeDisplay: '🇹🇷' },
+    { code: 'ua', name: 'Ukrainian', codeDisplay: '🇺🇦' },
+    { code: 'pk', name: 'Urdu', codeDisplay: '🇵🇰' },
+    { code: 'vn', name: 'Vietnamese', codeDisplay: '🇻🇳' },
+    { code: 'gb', name: 'Welsh', codeDisplay: '🇬🇧' }
+  ];
+
+  let selectedSourceLanguage = 'auto';
+  let selectedTargetLanguage = 'en';
+  let sourceDropdownOpen = false;
+  let targetDropdownOpen = false;
+
+  // Load initial data when sidebar opens
+  document.addEventListener('DOMContentLoaded', function () {
+    initializeUI();
+  });
+
+  /**
+   * Initialize the UI
+   */
+  function initializeUI() {
+    // Set default languages
+    selectedSourceLanguage = 'auto';
+    selectedTargetLanguage = 'us';
+
+    populateDropdowns();
+    updateLanguageDisplay();
+    updateToggleStates();
+    setupClickOutside();
+  }
+
+  /**
+   * Populate dropdown menus with language options
+   */
+  function populateDropdowns() {
+    const sourceDropdown = document.querySelector('#sourceLanguageGroup .dropdown-menu');
+    const targetDropdown = document.querySelector('#targetLanguageGroup .dropdown-menu');
+
+    // Populate source dropdown (includes auto detect)
+    sourceDropdown.innerHTML = '';
+    languages.forEach(lang => {
+      const item = createDropdownItem(lang, 'source');
+      sourceDropdown.appendChild(item);
+    });
+
+    // Populate target dropdown (excludes auto detect)
+    targetDropdown.innerHTML = '';
+    languages.filter(lang => lang.code !== 'auto').forEach(lang => {
+      const item = createDropdownItem(lang, 'target');
+      targetDropdown.appendChild(item);
+    });
+  }
+
+  /**
+   * Create a dropdown item element using HTML template
+   * @param {Object} lang - Language object
+   * @param {string} type - 'source' or 'target'
+   */
+  function createDropdownItem(lang, type) {
+    const template = document.getElementById('dropdownItemTemplate');
+    const item = template.content.cloneNode(true);
+    const dropdownItem = item.querySelector('.dropdown-item');
+
+    // Set data attributes and classes
+    dropdownItem.setAttribute('data-code', lang.code);
+
+    if ((type === 'source' && lang.code === selectedSourceLanguage) ||
+      (type === 'target' && lang.code === selectedTargetLanguage)) {
+      dropdownItem.classList.add('selected');
+    }
+
+    // Populate template content
+    const countryCode = dropdownItem.querySelector('.country-code');
+    const languageIcon = dropdownItem.querySelector('.language-icon');
+    const languageName = dropdownItem.querySelector('.language-name');
+
+    // Special case for Auto Detect - hide country code
+    if (lang.code === 'auto') {
+      countryCode.style.display = 'none';
+    } else {
+      countryCode.textContent = lang.codeDisplay;
+      countryCode.style.display = 'inline';
+    }
+
+    // languageIcon.textContent = lang.icon;
+    updateFlagClass(languageIcon, lang.code);
+    languageName.textContent = lang.name;
+
+    // Add click event
+    dropdownItem.onclick = () => selectLanguage(lang.code, type);
+
+    return item;
+  }
+
+  /**
+   * Toggle source language dropdown
+   */
+  function toggleSourceDropdown() {
+    if (targetDropdownOpen) {
+      closeTargetDropdown();
+    }
+    sourceDropdownOpen = !sourceDropdownOpen;
+    const dropdown = document.querySelector('#sourceLanguageGroup .dropdown-menu');
+    const input = document.querySelector('#sourceLanguageGroup .language-input');
+
+    if (sourceDropdownOpen) {
+      dropdown.classList.add('open');
+      input.classList.add('open');
+    } else {
+      dropdown.classList.remove('open');
+      input.classList.remove('open');
+    }
+  }
+
+  /**
+   * Toggle target language dropdown
+   */
+  function toggleTargetDropdown() {
+    if (sourceDropdownOpen) {
+      closeSourceDropdown();
+    }
+    targetDropdownOpen = !targetDropdownOpen;
+    const dropdown = document.querySelector('#targetLanguageGroup .dropdown-menu');
+    const input = document.querySelector('#targetLanguageGroup .language-input');
+
+    if (targetDropdownOpen) {
+      dropdown.classList.add('open');
+      input.classList.add('open');
+    } else {
+      dropdown.classList.remove('open');
+      input.classList.remove('open');
+    }
+  }
+
+  /**
+   * Close source dropdown
+   */
+  function closeSourceDropdown() {
+    sourceDropdownOpen = false;
+    const dropdown = document.querySelector('#sourceLanguageGroup .dropdown-menu');
+    const input = document.querySelector('#sourceLanguageGroup .language-input');
+    dropdown.classList.remove('open');
+    input.classList.remove('open');
+  }
+
+  /**
+   * Close target dropdown
+   */
+  function closeTargetDropdown() {
+    targetDropdownOpen = false;
+    const dropdown = document.querySelector('#targetLanguageGroup .dropdown-menu');
+    const input = document.querySelector('#targetLanguageGroup .language-input');
+    dropdown.classList.remove('open');
+    input.classList.remove('open');
+  }
+
+  /**
+   * Select a language
+   * @param {string} code - Language code
+   * @param {string} type - 'source' or 'target'
+   */
+  function selectLanguage(code, type) {
+    if (type === 'source') {
+      selectedSourceLanguage = code;
+      closeSourceDropdown();
+      updateLanguageDisplay('source');
+    } else {
+      selectedTargetLanguage = code;
+      closeTargetDropdown();
+      updateLanguageDisplay('target');
+    }
+
+    populateDropdowns(); // Refresh to update selected states
+  }
+
+  /**
+   * Update flag class for a language icon element
+   * @param {HTMLElement} iconElement - The icon element to update
+   * @param {string} countryCode - The country code for the flag class
+   */
+  function updateFlagClass(iconElement, countryCode) {
+    // Remove existing flag classes
+    iconElement.className = iconElement.className.replace(/fi-\w+/g, '');
+
+    // Special case for Auto Detect - show globe icon
+    if (countryCode === 'auto') {
+      iconElement.classList.remove('fi');
+      iconElement.textContent = '🌐';
+    } else {
+      iconElement.textContent = '';
+      // Add new flag class
+      iconElement.classList.add('fi');
+      iconElement.classList.add('fi-' + countryCode);
+    }
+  }
+
+  /**
+   * Update language display
+   * @param {string} type - 'source', 'target', or undefined for both
+   */
+  function updateLanguageDisplay(type) {
+    if (type === 'source' || type === undefined) {
+      const sourceLang = languages.find(lang => lang.code === selectedSourceLanguage);
+      document.querySelector('#sourceLanguageGroup .language-text').textContent = sourceLang.name;
+
+      // Update source icon
+      const sourceIcon = document.querySelector('#sourceLanguageGroup .language-icon');
+      updateFlagClass(sourceIcon, sourceLang.code);
+    }
+
+    if (type === 'target' || type === undefined) {
+      const targetLang = languages.find(lang => lang.code === selectedTargetLanguage);
+      document.querySelector('#targetLanguageGroup .language-text').textContent = targetLang.name;
+
+      // Update target icon
+      const targetIcon = document.querySelector('#targetLanguageGroup .language-icon');
+      updateFlagClass(targetIcon, targetLang.code);
+    }
+  }
+
+  /**
+   * Setup click outside to close dropdowns
+   */
+  function setupClickOutside() {
+    document.addEventListener('click', function (event) {
+      const sourceSelect = document.querySelector('#sourceLanguageGroup .language-select');
+      const targetSelect = document.querySelector('#targetLanguageGroup .language-select');
+
+      if (!sourceSelect.contains(event.target) && sourceDropdownOpen) {
+        closeSourceDropdown();
+      }
+
+      if (!targetSelect.contains(event.target) && targetDropdownOpen) {
+        closeTargetDropdown();
+      }
+    });
+  }
+
+  /**
+   * Toggle a setting
+   * @param {string} settingName - The name of the setting to toggle
+   */
+  function toggleSetting(settingName) {
+    settings[settingName] = !settings[settingName];
+    updateToggleStates();
+  }
+
+  /**
+   * Update toggle switch states
+   */
+  function updateToggleStates() {
+    Object.keys(settings).forEach(setting => {
+      const toggle = document.getElementById(setting + 'Toggle');
+      if (settings[setting]) {
+        toggle.classList.add('active');
+      } else {
+        toggle.classList.remove('active');
+      }
+    });
+  }
+
+  /**
+   * Translate content
+   */
+  function translateContent() {
+    showStatus('Translating...', 'success');
+
+    // Get translation settings
+    const translationData = {
+      sourceLanguage: selectedSourceLanguage,
+      targetLanguage: selectedTargetLanguage,
+      settings: settings
+    };
+
+    google.script.run
+      .withSuccessHandler(function (result) {
+        showStatus('Translation completed successfully!', 'success');
+      })
+      .withFailureHandler(showError)
+      .translateContent(translationData);
+  }
+
+  /**
+   * Show help
+   */
+  function showHelp() {
+    showStatus('Help: Select source and target languages, then click TRANSLATE. Use advanced settings to customize the translation process.', 'success');
+  }
+
+  /**
+   * Show about
+   */
+  function showAbout() {
+    showStatus('Google Sheets Translation Extension v1.0 - Translate your spreadsheet content easily!', 'success');
+  }
+
+  /**
+   * Shows a status message
+   * @param {string} message - The message to show
+   * @param {string} type - The type of message (success or error)
+   */
+  function showStatus(message, type) {
+    const statusDiv = document.getElementById('status');
+    statusDiv.textContent = message;
+    statusDiv.className = 'status ' + type;
+    statusDiv.style.display = 'block';
+
+    // Hide status after 4 seconds
+    setTimeout(function () {
+      statusDiv.style.display = 'none';
+    }, 4000);
+  }
+
+  /**
+   * Shows an error message
+   * @param {Error} error - The error object
+   */
+  function showError(error) {
+    console.error('Error:', error);
+    showStatus('An error occurred: ' + error.message, 'error');
+  }
+</script>
+
+  <script>
+  </script>
+</body>
+
+</html>
