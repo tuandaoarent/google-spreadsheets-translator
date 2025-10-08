@@ -75,46 +75,30 @@ function getSpreadsheetInfo() {
  * @return {Object} Result object with success status and message
  */
 function translateCurrentCell(sourceLanguage, targetLanguage) {
-  try {
-    const sheet = SpreadsheetApp.getActiveSheet();
-    const activeCell = sheet.getActiveCell();
+  const sheet = SpreadsheetApp.getActiveSheet();
+  const activeCell = sheet.getActiveCell();
 
-    // Get current cell value
-    const cellValue = activeCell.getValue();
+  // Get current cell value
+  const cellValue = activeCell.getValue();
 
-    // Check if cell has content
-    if (!cellValue || cellValue.toString().trim() === '') {
-      return {
-        success: false,
-        message: 'No content found in the selected cell'
-      };
-    }
-
-    // Handle auto-detect source language
-    let sourceLang = sourceLanguage;
-    if (sourceLanguage === 'auto') {
-      sourceLang = ''; // LanguageApp.translate uses empty string for auto-detection
-    }
-
-    // Use LanguageApp.translate for direct translation
-    const translatedText = LanguageApp.translate(cellValue.toString(), sourceLang, targetLanguage);
-
-    // Set the translated result directly in the cell
-    activeCell.setValue(translatedText);
-
-    return {
-      success: true,
-      message: `Translation completed from ${sourceLanguage} to ${targetLanguage}`,
-      originalValue: cellValue.toString(),
-      translatedValue: translatedText
-    };
-
-  } catch (error) {
+  // Check if cell has content
+  if (!cellValue || cellValue.toString().trim() === '') {
     return {
       success: false,
-      message: `Error during translation: ${error.message}`
+      message: 'No content found in the selected cell'
     };
   }
+
+  // Handle auto-detect source language
+  if (sourceLanguage === 'auto') {
+    sourceLanguage = ''; // LanguageApp.translate uses empty string for auto-detection
+  }
+
+  // Use LanguageApp.translate for direct translation
+  const translatedText = LanguageApp.translate(cellValue.toString(), sourceLanguage, targetLanguage);
+
+  // Set the translated result directly in the cell
+  activeCell.setValue(translatedText);
 }
 
 

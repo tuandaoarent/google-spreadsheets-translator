@@ -71,6 +71,12 @@
   let targetDropdownOpen = false;
   let statusTimeout = null;
 
+  // Status types constants
+  const STATUS_TYPES = {
+    SUCCESS: 'success',
+    ERROR: 'error'
+  };
+
   // Load initial data when sidebar opens
   document.addEventListener('DOMContentLoaded', function () {
     initializeUI();
@@ -331,7 +337,7 @@
     translateButton.textContent = 'TRANSLATING...';
     translateButton.classList.add('translating');
 
-    showStatus('Translating...', 'success');
+    showStatus('Translating...', STATUS_TYPES.SUCCESS);
 
     try {
       if (typeof google !== 'undefined' && google.script && google.script.run) {
@@ -339,25 +345,27 @@
         // selectedSourceLanguage and selectedTargetLanguage are already language codes
         const sourceLang = selectedSourceLanguage;
         const targetLang = selectedTargetLanguage;
-        
+
         google.script.run
-          .withSuccessHandler(function (result) {
-            if (result.success) {
-              showStatus(result.message, 'success');
-            } else {
-              showStatus(result.message, 'error');
-            }
+          // .withSuccessHandler(function (result) {
+          // if (result.success) {
+          //   showStatus(result.message, STATUS_TYPES.SUCCESS);
+          // } else {
+          //   showStatus(result.message, STATUS_TYPES.ERROR);
+          // }
+          .withSuccessHandler(function () {
+            showStatus(`Translation completed from ${sourceLang} to ${targetLang}`, STATUS_TYPES.SUCCESS);
           })
-          .withFailureHandler(function(error) {
-            showError(error);
+          .withFailureHandler(function (error) {
+            showStatus(error, STATUS_TYPES.ERROR);
           })
           .translateCurrentCell(sourceLang, targetLang);
       } else {
         // Fallback for local development or when Google Apps Script is not available
-        showStatus('Google Apps Script environment not available. This is a demo mode.', 'error');
+        showStatus('Google Apps Script environment not available. This is a demo mode.', STATUS_TYPES.ERROR);
       }
     } catch (error) {
-      showError(error);
+      showStatus(error, STATUS_TYPES.ERROR);
     } finally {
       enableTranslateButton();
     }
@@ -396,16 +404,16 @@
    */
   function setupHelpOverlay() {
     const overlay = document.getElementById('helpOverlay');
-    
+
     // Close on overlay background click
-    overlay.addEventListener('click', function(e) {
+    overlay.addEventListener('click', function (e) {
       if (e.target === overlay) {
         closeHelp();
       }
     });
-    
+
     // Close on escape key
-    document.addEventListener('keydown', function(e) {
+    document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape' && overlay.style.display === 'flex') {
         closeHelp();
       }
@@ -436,12 +444,4 @@
     }, 4000);
   }
 
-  /**
-   * Shows an error message
-   * @param {Error} error - The error object
-   */
-  function showError(error) {
-    console.error('Error:', error);
-    showStatus('An error occurred: ' + error.message, 'error');
-  }
 </script>
