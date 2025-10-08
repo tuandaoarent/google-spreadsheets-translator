@@ -685,7 +685,6 @@
   let selectedTargetLanguage = 'en';
   let sourceDropdownOpen = false;
   let targetDropdownOpen = false;
-  let statusTimeout = null;
 
   // Status types constants
   const STATUS_TYPES = {
@@ -955,34 +954,41 @@
 
     showStatus('Translating...', STATUS_TYPES.SUCCESS);
 
-    try {
-      if (typeof google !== 'undefined' && google.script && google.script.run) {
-        // Convert country codes to language codes
-        // selectedSourceLanguage and selectedTargetLanguage are already language codes
-        const sourceLang = selectedSourceLanguage;
-        const targetLang = selectedTargetLanguage;
+    // try {
+    //   if (typeof google !== 'undefined' && google.script && google.script.run) {
+    //     google.script.run
+    //       .withSuccessHandler(function () {
+    //         showStatus(`Translation completed from ${selectedSourceLanguage} to ${selectedTargetLanguage}`, STATUS_TYPES.SUCCESS);
+    //       })
+    //       .withFailureHandler(function (error) {
+    //         showStatus(error, STATUS_TYPES.ERROR);
+    //       })
+    //       .translateCurrentCell(selectedSourceLanguage, selectedTargetLanguage);
+    //   } else {
+    //     // Fallback for local development or when Google Apps Script is not available
+    //     showStatus('Google Apps Script environment not available. This is a demo mode.', STATUS_TYPES.ERROR);
+    //   }
+    // } catch (error) {
+    //   showStatus(error, STATUS_TYPES.ERROR);
+    // } finally {
+    //   enableTranslateButton();
+    // }
 
-        google.script.run
-          // .withSuccessHandler(function (result) {
-          // if (result.success) {
-          //   showStatus(result.message, STATUS_TYPES.SUCCESS);
-          // } else {
-          //   showStatus(result.message, STATUS_TYPES.ERROR);
-          // }
-          .withSuccessHandler(function () {
-            showStatus(`Translation completed from ${sourceLang} to ${targetLang}`, STATUS_TYPES.SUCCESS);
-          })
-          .withFailureHandler(function (error) {
-            showStatus(error, STATUS_TYPES.ERROR);
-          })
-          .translateCurrentCell(sourceLang, targetLang);
-      } else {
-        // Fallback for local development or when Google Apps Script is not available
-        showStatus('Google Apps Script environment not available. This is a demo mode.', STATUS_TYPES.ERROR);
+    const scriptContext = tryGetGoogleScriptContext(
+      () => {
+        showStatus(`Translation completed from ${selectedSourceLanguage} to ${selectedTargetLanguage}`, STATUS_TYPES.SUCCESS);
+        enableTranslateButton();
+      },
+      (error) => {
+        showStatus(error, STATUS_TYPES.ERROR);
+        enableTranslateButton();
       }
-    } catch (error) {
-      showStatus(error, STATUS_TYPES.ERROR);
-    } finally {
+    );
+    if (scriptContext) {
+      scriptContext.translateCurrentCell(selectedSourceLanguage, selectedTargetLanguage);
+    }
+    else {
+      showStatus('Google Apps Script environment not available. This is a demo mode.', STATUS_TYPES.ERROR);
       enableTranslateButton();
     }
   }
@@ -1047,17 +1053,21 @@
     statusDiv.textContent = message;
     statusDiv.className = 'status ' + type;
     statusDiv.style.display = 'block';
+  }
 
-    // Clear any existing timeout
-    if (statusTimeout) {
-      clearTimeout(statusTimeout);
+  function hideStatus() {
+    const statusDiv = document.getElementById('status');
+    statusDiv.style.display = 'none';
+  }
+
+  function tryGetGoogleScriptContext(successHandler, failureHandler) {
+    if (typeof google !== 'undefined' && google.script && google.script.run) {
+      return google.script.run
+        .withSuccessHandler(successHandler)
+        .withFailureHandler(failureHandler);
     }
 
-    // Hide status after 4 seconds
-    statusTimeout = setTimeout(function () {
-      statusDiv.style.display = 'none';
-      statusTimeout = null;
-    }, 4000);
+    return null;
   }
 
 </script>
