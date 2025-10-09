@@ -552,21 +552,21 @@
 
       <div class="setting-item">
         <span class="setting-label">Translate full sheet</span>
-        <div class="toggle-switch" id="fullSheetToggle" onclick="toggleSetting('fullSheet')">
+        <div class="toggle-switch" id="fullSheetToggle" onclick="toggleSetting(SETTING_NAMES.FULL_SHEET)">
           <div class="toggle-slider"></div>
         </div>
       </div>
 
       <div class="setting-item">
         <span class="setting-label">Duplicate sheet before to translate</span>
-        <div class="toggle-switch active" id="duplicateSheetToggle" onclick="toggleSetting('duplicateSheet')">
+        <div class="toggle-switch active" id="duplicateSheetToggle" onclick="toggleSetting(SETTING_NAMES.DUPLICATE_SHEET)">
           <div class="toggle-slider"></div>
         </div>
       </div>
 
       <div class="setting-item">
         <span class="setting-label">Apply background color to edited cells</span>
-        <div class="toggle-switch active" id="backgroundColorToggle" onclick="toggleSetting('backgroundColor')">
+        <div class="toggle-switch active" id="backgroundColorToggle" onclick="toggleSetting(SETTING_NAMES.BACKGROUND_COLOR)">
           <div class="toggle-slider"></div>
         </div>
       </div>
@@ -574,7 +574,7 @@
 
     <!-- About Information -->
     <div class="about-info">
-      Google Sheets Translation Extension v1.0 - Translate your spreadsheet content easily!
+      Google Spreadsheet Translation Extension v1.0 - Translate your spreadsheet content easily!
     </div>
   </div>
 
@@ -621,11 +621,18 @@
   </div>
 
   <script>
+  // Setting name constants
+  const SETTING_NAMES = {
+    FULL_SHEET: 'fullSheet',
+    DUPLICATE_SHEET: 'duplicateSheet',
+    BACKGROUND_COLOR: 'backgroundColor'
+  };
+
   // Translation settings
   let settings = {
-    fullSheet: false,
-    duplicateSheet: true,
-    backgroundColor: true
+    [SETTING_NAMES.FULL_SHEET]: false,
+    [SETTING_NAMES.DUPLICATE_SHEET]: true,
+    [SETTING_NAMES.BACKGROUND_COLOR]: true
   };
 
   // Language options - comprehensive list matching the image

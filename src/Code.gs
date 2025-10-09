@@ -79,6 +79,55 @@ function translateCurrentSheet(sourceLanguage, targetLanguage) {
   }
 }
 
+/**
+ * Translates only the selected cells in the current sheet
+ * @param {string} sourceLanguage - Source language code (e.g., 'en', 'fr', 'auto')
+ * @param {string} targetLanguage - Target language code (e.g., 'es', 'de')
+ */
+function translateSelected(sourceLanguage, targetLanguage) {
+  const sheet = SpreadsheetApp.getActiveSheet();
+  const selection = sheet.getSelection();
+  const activeRange = selection.getActiveRange();
+
+  // Check if there's a valid selection
+  if (!activeRange) {
+    throw new Error('No cells selected. Please select the cells you want to translate.');
+  }
+
+  // Handle auto-detect source language
+  if (sourceLanguage === 'auto') {
+    sourceLanguage = ''; // LanguageApp.translate uses empty string for auto-detection
+  }
+
+  // Get the values from the selected range
+  const values = activeRange.getValues();
+  const numRows = values.length;
+  const numCols = values[0].length;
+
+  // Iterate through the selected cells
+  for (let row = 0; row < numRows; row++) {
+    for (let col = 0; col < numCols; col++) {
+      const cellValue = values[row][col];
+
+      // Skip empty cells
+      if (!cellValue || cellValue.toString().trim() === '') {
+        continue;
+      }
+
+      try {
+        // Translate the cell content
+        const translatedText = LanguageApp.translate(cellValue.toString(), sourceLanguage, targetLanguage);
+        
+        // Set the translated result back to the cell
+        activeRange.getCell(row + 1, col + 1).setValue(translatedText);
+      } catch (error) {
+        console.error(`Error translating cell at row ${row + 1}, col ${col + 1}:`, error);
+        // Continue with other cells even if one fails
+      }
+    }
+  }
+}
+
 function include(filename) {
   return HtmlService.createHtmlOutputFromFile(filename).getContent();
 }

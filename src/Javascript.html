@@ -1,9 +1,16 @@
 <script>
+  // Setting name constants
+  const SETTING_NAMES = {
+    FULL_SHEET: 'fullSheet',
+    DUPLICATE_SHEET: 'duplicateSheet',
+    BACKGROUND_COLOR: 'backgroundColor'
+  };
+
   // Translation settings
   let settings = {
-    fullSheet: false,
-    duplicateSheet: true,
-    backgroundColor: true
+    [SETTING_NAMES.FULL_SHEET]: false,
+    [SETTING_NAMES.DUPLICATE_SHEET]: true,
+    [SETTING_NAMES.BACKGROUND_COLOR]: true
   };
 
   // Language options - comprehensive list matching the image
@@ -349,7 +356,12 @@
       }
     );
     if (scriptContext) {
-      scriptContext.translateCurrentSheet(selectedSourceLanguage, selectedTargetLanguage);
+      if (settings[SETTING_NAMES.FULL_SHEET]) {
+        scriptContext.translateCurrentSheet(selectedSourceLanguage, selectedTargetLanguage);
+      }
+      else {
+        scriptContext.translateSelected(selectedSourceLanguage, selectedTargetLanguage);
+      }
     }
     else {
       showStatus('Google Apps Script environment not available. This is a demo mode.', STATUS_TYPES.ERROR);
