@@ -263,12 +263,14 @@
     if (type === 'source') {
       selectedSourceLanguage = code;
       closeSourceDropdown();
-      updateLanguageDisplay('source');
     } else {
       selectedTargetLanguage = code;
       closeTargetDropdown();
-      updateLanguageDisplay('target');
     }
+
+    updateLanguageDisplay(type);
+    // Clear the target filter
+    clearFilter(type);
 
     populateDropdowns(); // Refresh to update selected states
   }
