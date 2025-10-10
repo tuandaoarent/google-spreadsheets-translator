@@ -276,6 +276,30 @@
   }
 
   /**
+   * Swap source and target languages
+   */
+  function swapLanguages() {
+    // Don't swap if source is "auto detect"
+    if (selectedSourceLanguage === 'auto') {
+      return;
+    }
+
+    // Store current values
+    const tempSource = selectedSourceLanguage;
+    const tempTarget = selectedTargetLanguage;
+
+    // Swap the languages
+    selectedSourceLanguage = tempTarget;
+    selectedTargetLanguage = tempSource;
+
+    // Update the display
+    updateLanguageDisplay();
+
+    // Refresh dropdowns to update selected states
+    populateDropdowns();
+  }
+
+  /**
    * Update flag class for a language icon element
    * @param {HTMLElement} iconElement - The icon element to update
    * @param {string} countryCode - The country code for the flag class
