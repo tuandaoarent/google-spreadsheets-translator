@@ -159,6 +159,31 @@ function setActiveCellValue(value) {
 }
 
 /**
+ * Duplicates the currently active sheet
+ * @return {string} The name of the duplicated sheet
+ */
+function duplicateActiveSheet() {
+  const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  const activeSheet = SpreadsheetApp.getActiveSheet();
+  const originalName = activeSheet.getName();
+  
+  // Create a copy of the active sheet
+  const duplicatedSheet = activeSheet.copyTo(spreadsheet);
+  
+  // Generate a new name for the duplicated sheet
+  const timestamp = new Date().toLocaleString();
+  const newName = `${originalName} - Copy (${timestamp})`;
+  
+  // Set the new name for the duplicated sheet
+  duplicatedSheet.setName(newName);
+  
+  // Activate the duplicated sheet
+  duplicatedSheet.activate();
+  
+  return newName;
+}
+
+/**
  * Gets information about the current spreadsheet
  * @return {Object} Spreadsheet information
  */

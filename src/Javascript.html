@@ -324,14 +324,14 @@
     const optionsContainer = groupElement.querySelector('.language-options');
     const noResultsContainer = groupElement.querySelector('.no-results');
     const items = optionsContainer.querySelectorAll('.dropdown-item');
-    
+
     const term = searchTerm.toLowerCase().trim();
     let visibleCount = 0;
-    
+
     items.forEach(item => {
       const languageName = item.querySelector('.language-name').textContent.toLowerCase();
       const countryCode = item.querySelector('.country-code').textContent.toLowerCase();
-      
+
       // Show item if search term matches language name or country code
       if (term === '' || languageName.includes(term) || countryCode.includes(term)) {
         item.style.display = 'flex';
@@ -340,7 +340,7 @@
         item.style.display = 'none';
       }
     });
-    
+
     // Show/hide no results message
     if (visibleCount === 0 && term !== '') {
       noResultsContainer.style.display = 'block';
@@ -356,13 +356,13 @@
   function clearFilter(type) {
     const groupElement = document.getElementById(type + 'LanguageGroup');
     const filterInput = groupElement.querySelector('.language-filter');
-    
+
     // Clear the input value
     filterInput.value = '';
-    
+
     // Reset the filter to show all languages
     filterLanguages(type, '');
-    
+
     // Focus back to the input for better UX
     filterInput.focus();
   }
@@ -427,27 +427,47 @@
 
     showStatus('Translating...', STATUS_TYPES.SUCCESS);
 
-    const scriptContext = tryGetGoogleScriptContext(
-      () => {
-        showStatus(`Translation completed from ${selectedSourceLanguage} to ${selectedTargetLanguage}`, STATUS_TYPES.SUCCESS);
-        enableTranslateButton();
-      },
-      (error) => {
-        showStatus(error, STATUS_TYPES.ERROR);
-        enableTranslateButton();
-      }
-    );
-    if (scriptContext) {
-      if (settings[SETTING_NAMES.FULL_SHEET]) {
-        scriptContext.translateCurrentSheet(selectedSourceLanguage, selectedTargetLanguage);
+    if (typeof google !== 'undefined' && google.script && google.script.run) {
+      if (settings[SETTING_NAMES.DUPLICATE_SHEET]) {
+        google.script.run
+          .withSuccessHandler(() => {
+            // After successful duplication, perform translation
+            performTranslation(selectedSourceLanguage, selectedTargetLanguage, enableTranslateButton);
+          })
+          .withFailureHandler((error) => {
+            enableTranslateButton();
+            showStatus(`Failed to duplicate sheet: ${error}`, STATUS_TYPES.ERROR);
+          })
+          .duplicateActiveSheet();
       }
       else {
-        scriptContext.translateSelected(selectedSourceLanguage, selectedTargetLanguage);
+        performTranslation(selectedSourceLanguage, selectedTargetLanguage, enableTranslateButton);
       }
+    } else {
+      enableTranslateButton();
+      showStatus('Google Apps Script environment not available. This is a demo mode.', STATUS_TYPES.ERROR);
+    }
+  }
+
+  /**
+   * Perform the actual translation operation
+   */
+  function performTranslation(sourceLanguage, targetLanguage, finalCb) {
+    const translationContext = google.script.run
+      .withSuccessHandler(() => {
+        finalCb();
+        showStatus(`Translation completed from ${sourceLanguage} to ${targetLanguage}`, STATUS_TYPES.SUCCESS);
+      })
+      .withFailureHandler((error) => {
+        finalCb();
+        showStatus(error, STATUS_TYPES.ERROR);
+      });
+
+    if (settings[SETTING_NAMES.FULL_SHEET]) {
+      translationContext.translateCurrentSheet(sourceLanguage, targetLanguage);
     }
     else {
-      showStatus('Google Apps Script environment not available. This is a demo mode.', STATUS_TYPES.ERROR);
-      enableTranslateButton();
+      translationContext.translateSelected(sourceLanguage, targetLanguage);
     }
   }
 
