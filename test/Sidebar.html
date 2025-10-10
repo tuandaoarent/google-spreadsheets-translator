@@ -411,6 +411,47 @@
     transform: translateX(20px);
   }
 
+  .color-picker-container {
+    margin-top: 12px;
+    margin-left: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 0;
+    border-top: 1px solid #e0e0e0;
+  }
+
+  .color-picker-container.hidden {
+    display: none;
+  }
+
+  .color-picker-label {
+    font-size: 13px;
+    color: #666;
+    font-weight: 500;
+  }
+
+  .color-picker {
+    width: 40px;
+    height: 32px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    cursor: pointer;
+    background: none;
+    padding: 0;
+    outline: none;
+    transition: border-color 0.2s ease;
+  }
+
+  .color-picker:hover {
+    border-color: #2d5a3d;
+  }
+
+  .color-picker:focus {
+    border-color: #2d5a3d;
+    box-shadow: 0 0 0 2px rgba(45, 90, 61, 0.1);
+  }
+
   .footer {
     position: fixed;
     bottom: 0;
@@ -704,6 +745,11 @@
           <div class="toggle-slider"></div>
         </div>
       </div>
+      
+      <div class="color-picker-container hidden" id="colorPickerContainer">
+        <span class="color-picker-label">Background color:</span>
+        <input type="color" id="backgroundColorPicker" class="color-picker" value="#ffff00" onchange="updateBackgroundColor(this.value)">
+      </div>
     </div>
 
     <!-- About Information -->
@@ -768,6 +814,9 @@
     [SETTING_NAMES.DUPLICATE_SHEET]: true,
     [SETTING_NAMES.BACKGROUND_COLOR]: true
   };
+
+  // Background color setting
+  let backgroundColor = '#ffff00';
 
   // Language options - comprehensive list matching the image
   const languages = [
@@ -855,6 +904,7 @@
     populateDropdowns();
     updateLanguageDisplay();
     updateToggleStates();
+    updateColorPickerVisibility();
     setupClickOutside();
     setupHelpOverlay();
   }
@@ -1080,14 +1130,14 @@
     const optionsContainer = groupElement.querySelector('.language-options');
     const noResultsContainer = groupElement.querySelector('.no-results');
     const items = optionsContainer.querySelectorAll('.dropdown-item');
-    
+
     const term = searchTerm.toLowerCase().trim();
     let visibleCount = 0;
-    
+
     items.forEach(item => {
       const languageName = item.querySelector('.language-name').textContent.toLowerCase();
       const countryCode = item.querySelector('.country-code').textContent.toLowerCase();
-      
+
       // Show item if search term matches language name or country code
       if (term === '' || languageName.includes(term) || countryCode.includes(term)) {
         item.style.display = 'flex';
@@ -1096,7 +1146,7 @@
         item.style.display = 'none';
       }
     });
-    
+
     // Show/hide no results message
     if (visibleCount === 0 && term !== '') {
       noResultsContainer.style.display = 'block';
@@ -1112,13 +1162,13 @@
   function clearFilter(type) {
     const groupElement = document.getElementById(type + 'LanguageGroup');
     const filterInput = groupElement.querySelector('.language-filter');
-    
+
     // Clear the input value
     filterInput.value = '';
-    
+
     // Reset the filter to show all languages
     filterLanguages(type, '');
-    
+
     // Focus back to the input for better UX
     filterInput.focus();
   }
@@ -1155,6 +1205,7 @@
   function toggleSetting(settingName) {
     settings[settingName] = !settings[settingName];
     updateToggleStates();
+    updateColorPickerVisibility();
   }
 
   /**
@@ -1172,6 +1223,26 @@
   }
 
   /**
+   * Update color picker visibility based on background color setting
+   */
+  function updateColorPickerVisibility() {
+    const colorPickerContainer = document.getElementById('colorPickerContainer');
+    if (settings[SETTING_NAMES.BACKGROUND_COLOR]) {
+      colorPickerContainer.classList.remove('hidden');
+    } else {
+      colorPickerContainer.classList.add('hidden');
+    }
+  }
+
+  /**
+   * Update background color setting
+   * @param {string} color - The selected color value
+   */
+  function updateBackgroundColor(color) {
+    backgroundColor = color;
+  }
+
+  /**
    * Translate content
    */
   function translateContent() {
@@ -1181,29 +1252,56 @@
     translateButton.textContent = 'TRANSLATING...';
     translateButton.classList.add('translating');
 
-    showStatus('Translating...', STATUS_TYPES.SUCCESS);
 
-    const scriptContext = tryGetGoogleScriptContext(
-      () => {
-        showStatus(`Translation completed from ${selectedSourceLanguage} to ${selectedTargetLanguage}`, STATUS_TYPES.SUCCESS);
-        enableTranslateButton();
-      },
-      (error) => {
-        showStatus(error, STATUS_TYPES.ERROR);
-        enableTranslateButton();
-      }
-    );
-    if (scriptContext) {
-      if (settings[SETTING_NAMES.FULL_SHEET]) {
-        scriptContext.translateCurrentSheet(selectedSourceLanguage, selectedTargetLanguage);
+    if (typeof google !== 'undefined' && google.script && google.script.run) {
+      if (settings[SETTING_NAMES.DUPLICATE_SHEET]) {
+        showStatus('Duplicating sheet...', STATUS_TYPES.SUCCESS);
+
+        google.script.run
+          .withSuccessHandler(() => {
+            // After successful duplication, perform translation
+            performTranslation(selectedSourceLanguage, selectedTargetLanguage, enableTranslateButton);
+          })
+          .withFailureHandler((error) => {
+            enableTranslateButton();
+            showStatus(`Failed to duplicate sheet: ${error}`, STATUS_TYPES.ERROR);
+          })
+          .duplicateActiveSheet();
       }
       else {
-        scriptContext.translateSelected(selectedSourceLanguage, selectedTargetLanguage);
+        performTranslation(selectedSourceLanguage, selectedTargetLanguage, enableTranslateButton);
       }
+    } else {
+      enableTranslateButton();
+      showStatus('Google Apps Script environment not available. This is a demo mode.', STATUS_TYPES.ERROR);
+    }
+  }
+
+  /**
+   * Perform the actual translation operation
+   */
+  function performTranslation(sourceLanguage, targetLanguage, finalCb) {
+    showStatus('Translating...', STATUS_TYPES.SUCCESS);
+
+    const translationContext = google.script.run
+      .withSuccessHandler(() => {
+        finalCb();
+        const sourceLang = languages.find(lang => lang.languageCode === sourceLanguage);
+        const targetLang = languages.find(lang => lang.languageCode === targetLanguage);
+        const sourceName = sourceLang ? sourceLang.name : sourceLanguage;
+        const targetName = targetLang ? targetLang.name : targetLanguage;
+        showStatus(`Translation completed from ${sourceName} to ${targetName}`, STATUS_TYPES.SUCCESS);
+      })
+      .withFailureHandler((error) => {
+        finalCb();
+        showStatus(error, STATUS_TYPES.ERROR);
+      });
+
+    if (settings[SETTING_NAMES.FULL_SHEET]) {
+      translationContext.translateCurrentSheet(sourceLanguage, targetLanguage);
     }
     else {
-      showStatus('Google Apps Script environment not available. This is a demo mode.', STATUS_TYPES.ERROR);
-      enableTranslateButton();
+      translationContext.translateSelected(sourceLanguage, targetLanguage);
     }
   }
 

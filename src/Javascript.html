@@ -13,6 +13,9 @@
     [SETTING_NAMES.BACKGROUND_COLOR]: true
   };
 
+  // Background color setting
+  let backgroundColor = '#ffff00';
+
   // Language options - comprehensive list matching the image
   const languages = [
     { countryCode: 'auto', languageCode: 'auto', name: 'Auto detect', codeDisplay: '' },
@@ -99,6 +102,7 @@
     populateDropdowns();
     updateLanguageDisplay();
     updateToggleStates();
+    updateColorPickerVisibility();
     setupClickOutside();
     setupHelpOverlay();
   }
@@ -399,6 +403,7 @@
   function toggleSetting(settingName) {
     settings[settingName] = !settings[settingName];
     updateToggleStates();
+    updateColorPickerVisibility();
   }
 
   /**
@@ -413,6 +418,26 @@
         toggle.classList.remove('active');
       }
     });
+  }
+
+  /**
+   * Update color picker visibility based on background color setting
+   */
+  function updateColorPickerVisibility() {
+    const colorPickerContainer = document.getElementById('colorPickerContainer');
+    if (settings[SETTING_NAMES.BACKGROUND_COLOR]) {
+      colorPickerContainer.classList.remove('hidden');
+    } else {
+      colorPickerContainer.classList.add('hidden');
+    }
+  }
+
+  /**
+   * Update background color setting
+   * @param {string} color - The selected color value
+   */
+  function updateBackgroundColor(color) {
+    backgroundColor = color;
   }
 
   /**
