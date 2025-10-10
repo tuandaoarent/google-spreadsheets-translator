@@ -167,6 +167,19 @@ function duplicateActiveSheet() {
   const activeSheet = SpreadsheetApp.getActiveSheet();
   const originalName = activeSheet.getName();
   
+  // Get the currently selected cell position before duplication (if any)
+  let selectedRow = 1;
+  let selectedColumn = 1;
+  
+  const activeCell = activeSheet.getActiveCell();
+  if (activeCell) {
+    selectedRow = activeCell.getRow();
+    selectedColumn = activeCell.getColumn();
+  }
+  
+  // Get the index of the current sheet
+  const sourceIndex = activeSheet.getIndex();
+  
   // Create a copy of the active sheet
   const duplicatedSheet = activeSheet.copyTo(spreadsheet);
   
@@ -177,8 +190,12 @@ function duplicateActiveSheet() {
   // Set the new name for the duplicated sheet
   duplicatedSheet.setName(newName);
   
-  // Activate the duplicated sheet
+  // Move the duplicated sheet to be right after the source sheet
   duplicatedSheet.activate();
+  spreadsheet.moveActiveSheet(sourceIndex + 1);
+  
+  // Focus on the same cell coordinate in the duplicated sheet (or A1 if no cell was selected)
+  duplicatedSheet.getRange(selectedRow, selectedColumn).activate();
   
   return newName;
 }
