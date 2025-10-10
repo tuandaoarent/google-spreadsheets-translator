@@ -29,9 +29,10 @@ function showSidebar() {
  * Translates the current cell content using LanguageApp.translate()
  * @param {string} sourceLanguage - Source language code (e.g., 'en', 'fr', 'auto')
  * @param {string} targetLanguage - Target language code (e.g., 'es', 'de')
+ * @param {string} backgroundColor - Background color for edited cells (optional)
  * @return {Object} Result object with success status and message
  */
-function translateCurrentCell(sourceLanguage, targetLanguage) {
+function translateCurrentCell(sourceLanguage, targetLanguage, backgroundColor = null) {
   const sheet = SpreadsheetApp.getActiveSheet();
   const activeCell = sheet.getActiveCell();
 
@@ -53,9 +54,20 @@ function translateCurrentCell(sourceLanguage, targetLanguage) {
 
   // Set the translated result directly in the cell
   activeCell.setValue(translatedText);
+  
+  // Apply background color if provided
+  if (backgroundColor) {
+    activeCell.setBackground(backgroundColor);
+  }
 }
 
-function translateCurrentSheet(sourceLanguage, targetLanguage) {
+/**
+ * Translates the entire current sheet
+ * @param {string} sourceLanguage - Source language code (e.g., 'en', 'fr', 'auto')
+ * @param {string} targetLanguage - Target language code (e.g., 'es', 'de')
+ * @param {string} backgroundColor - Background color for edited cells (optional)
+ */
+function translateCurrentSheet(sourceLanguage, targetLanguage, backgroundColor = null) {
   const sheet = SpreadsheetApp.getActiveSheet();
   const dataRange = sheet.getDataRange(); // Gets the range with data
   const values = dataRange.getValues();
@@ -73,8 +85,14 @@ function translateCurrentSheet(sourceLanguage, targetLanguage) {
         continue;
       }
 
-      const translatedText = LanguageApp.translate(cellValue.toString(), sourceLanguage, targetLanguage)
-      sheet.getRange(row + 1, col + 1).setValue(translatedText);;
+      const translatedText = LanguageApp.translate(cellValue.toString(), sourceLanguage, targetLanguage);
+      const cellRange = sheet.getRange(row + 1, col + 1);
+      cellRange.setValue(translatedText);
+      
+      // Apply background color if provided
+      if (backgroundColor) {
+        cellRange.setBackground(backgroundColor);
+      }
     }
   }
 }
@@ -83,8 +101,9 @@ function translateCurrentSheet(sourceLanguage, targetLanguage) {
  * Translates only the selected cells in the current sheet
  * @param {string} sourceLanguage - Source language code (e.g., 'en', 'fr', 'auto')
  * @param {string} targetLanguage - Target language code (e.g., 'es', 'de')
+ * @param {string} backgroundColor - Background color for edited cells (optional)
  */
-function translateSelected(sourceLanguage, targetLanguage) {
+function translateSelected(sourceLanguage, targetLanguage, backgroundColor = null) {
   const sheet = SpreadsheetApp.getActiveSheet();
   const selection = sheet.getSelection();
   const activeRange = selection.getActiveRange();
@@ -118,8 +137,16 @@ function translateSelected(sourceLanguage, targetLanguage) {
         // Translate the cell content
         const translatedText = LanguageApp.translate(cellValue.toString(), sourceLanguage, targetLanguage);
         
+        // Get the specific cell range
+        const cellRange = activeRange.getCell(row + 1, col + 1);
+        
         // Set the translated result back to the cell
-        activeRange.getCell(row + 1, col + 1).setValue(translatedText);
+        cellRange.setValue(translatedText);
+        
+        // Apply background color if provided
+        if (backgroundColor) {
+          cellRange.setBackground(backgroundColor);
+        }
       } catch (error) {
         console.error(`Error translating cell at row ${row + 1}, col ${col + 1}:`, error);
         // Continue with other cells even if one fails

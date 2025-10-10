@@ -481,6 +481,9 @@
   function performTranslation(sourceLanguage, targetLanguage, finalCb) {
     showStatus('Translating...', STATUS_TYPES.SUCCESS);
 
+    // Determine background color based on settings
+    const bgColor = settings[SETTING_NAMES.BACKGROUND_COLOR] ? backgroundColor : null;
+
     const translationContext = google.script.run
       .withSuccessHandler(() => {
         finalCb();
@@ -496,10 +499,10 @@
       });
 
     if (settings[SETTING_NAMES.FULL_SHEET]) {
-      translationContext.translateCurrentSheet(sourceLanguage, targetLanguage);
+      translationContext.translateCurrentSheet(sourceLanguage, targetLanguage, bgColor);
     }
     else {
-      translationContext.translateSelected(sourceLanguage, targetLanguage);
+      translationContext.translateSelected(sourceLanguage, targetLanguage, bgColor);
     }
   }
 
