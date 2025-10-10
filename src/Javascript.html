@@ -425,10 +425,11 @@
     translateButton.textContent = 'TRANSLATING...';
     translateButton.classList.add('translating');
 
-    showStatus('Translating...', STATUS_TYPES.SUCCESS);
 
     if (typeof google !== 'undefined' && google.script && google.script.run) {
       if (settings[SETTING_NAMES.DUPLICATE_SHEET]) {
+        showStatus('Duplicating sheet...', STATUS_TYPES.SUCCESS);
+
         google.script.run
           .withSuccessHandler(() => {
             // After successful duplication, perform translation
@@ -453,10 +454,16 @@
    * Perform the actual translation operation
    */
   function performTranslation(sourceLanguage, targetLanguage, finalCb) {
+    showStatus('Translating...', STATUS_TYPES.SUCCESS);
+
     const translationContext = google.script.run
       .withSuccessHandler(() => {
         finalCb();
-        showStatus(`Translation completed from ${sourceLanguage} to ${targetLanguage}`, STATUS_TYPES.SUCCESS);
+        const sourceLang = languages.find(lang => lang.languageCode === sourceLanguage);
+        const targetLang = languages.find(lang => lang.languageCode === targetLanguage);
+        const sourceName = sourceLang ? sourceLang.name : sourceLanguage;
+        const targetName = targetLang ? targetLang.name : targetLanguage;
+        showStatus(`Translation completed from ${sourceName} to ${targetName}`, STATUS_TYPES.SUCCESS);
       })
       .withFailureHandler((error) => {
         finalCb();
