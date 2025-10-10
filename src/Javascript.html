@@ -107,21 +107,23 @@
    * Populate dropdown menus with language options
    */
   function populateDropdowns() {
-    const sourceDropdown = document.querySelector('#sourceLanguageGroup .dropdown-menu');
-    const targetDropdown = document.querySelector('#targetLanguageGroup .dropdown-menu');
+    const sourceGroup = document.getElementById('sourceLanguageGroup');
+    const targetGroup = document.getElementById('targetLanguageGroup');
+    const sourceOptions = sourceGroup.querySelector('.language-options');
+    const targetOptions = targetGroup.querySelector('.language-options');
 
     // Populate source dropdown (includes auto detect)
-    sourceDropdown.innerHTML = '';
+    sourceOptions.innerHTML = '';
     languages.forEach(lang => {
       const item = createDropdownItem(lang, 'source');
-      sourceDropdown.appendChild(item);
+      sourceOptions.appendChild(item);
     });
 
     // Populate target dropdown (excludes auto detect)
-    targetDropdown.innerHTML = '';
+    targetOptions.innerHTML = '';
     languages.filter(lang => lang.languageCode !== 'auto').forEach(lang => {
       const item = createDropdownItem(lang, 'target');
-      targetDropdown.appendChild(item);
+      targetOptions.appendChild(item);
     });
   }
 
@@ -174,15 +176,24 @@
       closeTargetDropdown();
     }
     sourceDropdownOpen = !sourceDropdownOpen;
-    const dropdown = document.querySelector('#sourceLanguageGroup .dropdown-menu');
-    const input = document.querySelector('#sourceLanguageGroup .language-input');
+    const sourceGroup = document.getElementById('sourceLanguageGroup');
+    const dropdown = sourceGroup.querySelector('.dropdown-menu');
+    const input = sourceGroup.querySelector('.language-input');
 
     if (sourceDropdownOpen) {
       dropdown.classList.add('open');
       input.classList.add('open');
+      // Focus the filter input when dropdown opens
+      setTimeout(() => {
+        sourceGroup.querySelector('.language-filter').focus();
+      }, 100);
     } else {
       dropdown.classList.remove('open');
       input.classList.remove('open');
+      // Clear filter when closing
+      const filterInput = sourceGroup.querySelector('.language-filter');
+      filterInput.value = '';
+      filterLanguages('source', '');
     }
   }
 
@@ -194,15 +205,24 @@
       closeSourceDropdown();
     }
     targetDropdownOpen = !targetDropdownOpen;
-    const dropdown = document.querySelector('#targetLanguageGroup .dropdown-menu');
-    const input = document.querySelector('#targetLanguageGroup .language-input');
+    const targetGroup = document.getElementById('targetLanguageGroup');
+    const dropdown = targetGroup.querySelector('.dropdown-menu');
+    const input = targetGroup.querySelector('.language-input');
 
     if (targetDropdownOpen) {
       dropdown.classList.add('open');
       input.classList.add('open');
+      // Focus the filter input when dropdown opens
+      setTimeout(() => {
+        targetGroup.querySelector('.language-filter').focus();
+      }, 100);
     } else {
       dropdown.classList.remove('open');
       input.classList.remove('open');
+      // Clear filter when closing
+      const filterInput = targetGroup.querySelector('.language-filter');
+      filterInput.value = '';
+      filterLanguages('target', '');
     }
   }
 
@@ -211,8 +231,9 @@
    */
   function closeSourceDropdown() {
     sourceDropdownOpen = false;
-    const dropdown = document.querySelector('#sourceLanguageGroup .dropdown-menu');
-    const input = document.querySelector('#sourceLanguageGroup .language-input');
+    const sourceGroup = document.getElementById('sourceLanguageGroup');
+    const dropdown = sourceGroup.querySelector('.dropdown-menu');
+    const input = sourceGroup.querySelector('.language-input');
     dropdown.classList.remove('open');
     input.classList.remove('open');
   }
@@ -222,8 +243,9 @@
    */
   function closeTargetDropdown() {
     targetDropdownOpen = false;
-    const dropdown = document.querySelector('#targetLanguageGroup .dropdown-menu');
-    const input = document.querySelector('#targetLanguageGroup .language-input');
+    const targetGroup = document.getElementById('targetLanguageGroup');
+    const dropdown = targetGroup.querySelector('.dropdown-menu');
+    const input = targetGroup.querySelector('.language-input');
     dropdown.classList.remove('open');
     input.classList.remove('open');
   }
@@ -293,6 +315,59 @@
   }
 
   /**
+   * Filter languages based on search term
+   * @param {string} type - 'source' or 'target'
+   * @param {string} searchTerm - The search term to filter by
+   */
+  function filterLanguages(type, searchTerm) {
+    const groupElement = document.getElementById(type + 'LanguageGroup');
+    const optionsContainer = groupElement.querySelector('.language-options');
+    const noResultsContainer = groupElement.querySelector('.no-results');
+    const items = optionsContainer.querySelectorAll('.dropdown-item');
+    
+    const term = searchTerm.toLowerCase().trim();
+    let visibleCount = 0;
+    
+    items.forEach(item => {
+      const languageName = item.querySelector('.language-name').textContent.toLowerCase();
+      const countryCode = item.querySelector('.country-code').textContent.toLowerCase();
+      
+      // Show item if search term matches language name or country code
+      if (term === '' || languageName.includes(term) || countryCode.includes(term)) {
+        item.style.display = 'flex';
+        visibleCount++;
+      } else {
+        item.style.display = 'none';
+      }
+    });
+    
+    // Show/hide no results message
+    if (visibleCount === 0 && term !== '') {
+      noResultsContainer.style.display = 'block';
+    } else {
+      noResultsContainer.style.display = 'none';
+    }
+  }
+
+  /**
+   * Clear the filter input and reset the dropdown
+   * @param {string} type - 'source' or 'target'
+   */
+  function clearFilter(type) {
+    const groupElement = document.getElementById(type + 'LanguageGroup');
+    const filterInput = groupElement.querySelector('.language-filter');
+    
+    // Clear the input value
+    filterInput.value = '';
+    
+    // Reset the filter to show all languages
+    filterLanguages(type, '');
+    
+    // Focus back to the input for better UX
+    filterInput.focus();
+  }
+
+  /**
    * Setup click outside to close dropdowns
    */
   function setupClickOutside() {
@@ -306,6 +381,13 @@
 
       if (!targetSelect.contains(event.target) && targetDropdownOpen) {
         closeTargetDropdown();
+      }
+    });
+
+    // Prevent dropdown from closing when clicking on filter inputs or clear buttons
+    document.addEventListener('click', function (event) {
+      if (event.target.classList.contains('language-filter') || event.target.classList.contains('clear-filter')) {
+        event.stopPropagation();
       }
     });
   }

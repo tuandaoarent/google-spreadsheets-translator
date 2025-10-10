@@ -22,7 +22,20 @@
           <span class="dropdown-arrow">⏷</span>
         </div>
         <div class="dropdown-menu">
-          <!-- Source language options will be populated by JavaScript -->
+          <div class="filter-container">
+            <div class="input-wrapper">
+              <input type="text" class="language-filter" placeholder="Search languages..." onkeyup="filterLanguages('source', this.value)">
+              <button type="button" class="clear-filter" onclick="clearFilter('source')" title="Clear search">
+                <span class="clear-icon">×</span>
+              </button>
+            </div>
+          </div>
+          <div class="language-options">
+            <!-- Source language options will be populated by JavaScript -->
+          </div>
+          <div class="no-results" style="display: none;">
+            <div class="no-results-message">No languages found</div>
+          </div>
         </div>
       </div>
     </div>
@@ -36,7 +49,20 @@
           <span class="dropdown-arrow">⏷</span>
         </div>
         <div class="dropdown-menu">
-          <!-- Target language options will be populated by JavaScript -->
+          <div class="filter-container">
+            <div class="input-wrapper">
+              <input type="text" class="language-filter" placeholder="Search languages..." onkeyup="filterLanguages('target', this.value)">
+              <button type="button" class="clear-filter" onclick="clearFilter('target')" title="Clear search">
+                <span class="clear-icon">×</span>
+              </button>
+            </div>
+          </div>
+          <div class="language-options">
+            <!-- Target language options will be populated by JavaScript -->
+          </div>
+          <div class="no-results" style="display: none;">
+            <div class="no-results-message">No languages found</div>
+          </div>
         </div>
       </div>
     </div>
